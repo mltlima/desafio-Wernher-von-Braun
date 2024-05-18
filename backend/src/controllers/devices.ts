@@ -35,34 +35,34 @@ export const addDevice = async (req: Request, res: Response) => {
 };
 
 export const getDeviceDetails = async (req: Request, res: Response) => {
-    try {
+  try {
     const device = await DeviceService.getDeviceById(req.params.id);
     if (!device) return res.status(404).json({ error: 'Device not found' });
     res.json(device);
-    } catch (err) {
+  } catch (err) {
     res.status(500).json({ error: 'Failed to fetch device details' });
-    }
+  }
 };
 
 export const updateDevice = async (req: Request, res: Response) => {
-const { error } = deviceSchema.validate(req.body);
-if (error) return res.status(400).json({ error: error.details[0].message });
+  const { error } = deviceSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
 
-try {
-  const device = await DeviceService.updateDevice(req.params.id, req.body);
-  if (!device) return res.status(404).json({ error: 'Device not found' });
-  res.json(device);
-} catch (err) {
-  res.status(500).json({ error: 'Failed to update device' });
-}
+  try {
+    const device = await DeviceService.updateDevice(req.params.id, req.body);
+    if (!device) return res.status(404).json({ error: 'Device not found' });
+    res.json(device);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update device' });
+  }
 };
 
 export const deleteDevice = async (req: Request, res: Response) => {
-try {
-  const device = await DeviceService.deleteDevice(req.params.id);
-  if (!device) return res.status(404).json({ error: 'Device not found' });
-  res.json({ message: 'Device deleted' });
-} catch (err) {
-  res.status(500).json({ error: 'Failed to delete device' });
-}
+  try {
+    const device = await DeviceService.deleteDevice(req.params.id);
+    if (!device) return res.status(404).json({ error: 'Device not found' });
+    res.json({ message: 'Device deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete device' });
+  }
 };
