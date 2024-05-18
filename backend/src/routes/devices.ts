@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { getDevices, addDevice, updateDevice, deleteDevice, getDeviceDetails } from '../controllers/devices';
+import auth from '../middleware/auth';
 
 const router = Router();
 
-router.get('/', getDevices);
-router.post('/', addDevice);
-router.get('/:id', getDeviceDetails);
-router.put('/:id', updateDevice);
-router.delete('/:id', deleteDevice);
+router.get('/', auth, getDevices);
+router.post('/', auth, addDevice);
+router.get('/:id', auth, getDeviceDetails);
+router.put('/:id', auth, updateDevice);
+router.delete('/:id', auth, deleteDevice);
 
 export default router;

@@ -5,7 +5,7 @@ interface ICommand {
   parameters: string[];
 }
 
-interface IDevice extends Document {
+export interface IDevice extends Document {
   identifier: string;
   description: string;
   manufacturer: string;
