@@ -1,24 +1,31 @@
 import request from 'supertest';
-import app from '../src/server';
+import app from '../src/app';
 import mongoose from 'mongoose';
+import User from '../src/models/User';
+import Device from '../src/models/Device';
 
 let token: string;
+
 beforeAll(async () => {
-    await mongoose.connect(process.env.MONGO_URI!);
-  
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        username: 'testuser',
-        email: 'testuser@example.com',
-        password: 'password123'
-      });
-    token = res.body.token;
-  });
-  
-  afterAll(async () => {
-    await mongoose.connection.close();
-  });
+  await mongoose.connect(process.env.MONGO_URI as string);
+
+  // Limpar coleções de usuários e dispositivos
+  await User.deleteMany({});
+  await Device.deleteMany({});
+
+  // Registrar um novo usuário e obter o token JWT
+  const res = await request(app)
+    .post('/api/auth/register')
+    .send({
+      username: 'testuser',
+      email: 'testuser@example.com',
+      password: 'password123'
+    });
+
+  token = res.body.token;
+  console.log('Register Response:', res.body);
+  console.log('Login Token:', token);
+});
 
 afterAll(async () => {
   await mongoose.connection.close();
@@ -41,6 +48,7 @@ describe('Device Endpoints', () => {
           }
         ]
       });
+    console.log('Create Device Response:', res.body);
     expect(res.statusCode).toEqual(201);
     expect(res.body).toHaveProperty('identifier', 'device1');
   });
@@ -49,6 +57,7 @@ describe('Device Endpoints', () => {
     const res = await request(app)
       .get('/api/devices')
       .set('Authorization', `Bearer ${token}`);
+    console.log('Get All Devices Response:', res.body);
     expect(res.statusCode).toEqual(200);
     expect(res.body.length).toBeGreaterThan(0);
   });
@@ -73,6 +82,7 @@ describe('Device Endpoints', () => {
     const res = await request(app)
       .get(`/api/devices/${device.body._id}`)
       .set('Authorization', `Bearer ${token}`);
+    console.log('Get Device by ID Response:', res.body);
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('identifier', 'device2');
   });
@@ -100,14 +110,9 @@ describe('Device Endpoints', () => {
       .send({
         description: 'Updated Device 3',
         manufacturer: 'Updated Manufacturer',
-        url: 'http://example.com/updateddevice3',
-        commands: [
-          {
-            command: 'read',
-            parameters: []
-          }
-        ]
+        url: 'http://example.com/updateddevice3'
       });
+    console.log('Update Device Response:', res.body);
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('description', 'Updated Device 3');
   });
@@ -132,6 +137,7 @@ describe('Device Endpoints', () => {
     const res = await request(app)
       .delete(`/api/devices/${device.body._id}`)
       .set('Authorization', `Bearer ${token}`);
+    console.log('Delete Device Response:', res.body);
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('message', 'Device deleted');
   });
@@ -151,6 +157,7 @@ describe('Device Endpoints', () => {
           }
         ]
       });
+    console.log('Create Device without Token Response:', res.body);
     expect(res.statusCode).toEqual(401);
   });
 });

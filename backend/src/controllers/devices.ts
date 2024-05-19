@@ -13,6 +13,17 @@ const deviceSchema = Joi.object({
   })).required()
 });
 
+const updateDeviceSchema = Joi.object({
+  identifier: Joi.string().optional(),
+  description: Joi.string().optional(),
+  manufacturer: Joi.string().optional(),
+  url: Joi.string().uri().optional(),
+  commands: Joi.array().items(Joi.object({
+    command: Joi.string().optional(),
+    parameters: Joi.array().items(Joi.string()).optional()
+  })).optional()
+}).min(1);
+
 export const getDevices = async (req: Request, res: Response) => {
   try {
     const devices = await DeviceService.getAllDevices();
@@ -45,7 +56,7 @@ export const getDeviceDetails = async (req: Request, res: Response) => {
 };
 
 export const updateDevice = async (req: Request, res: Response) => {
-  const { error } = deviceSchema.validate(req.body);
+  const { error } = updateDeviceSchema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   try {

@@ -1,14 +1,17 @@
 import request from 'supertest';
-import app from '../src/server';
+import app from '../src/app';
 import mongoose from 'mongoose';
+import User from '../src/models/User';
 
 beforeAll(async () => {
-    await mongoose.connect(process.env.MONGO_URI!);
-  });
-  
-  afterAll(async () => {
-    await mongoose.connection.close();
-  });
+  await mongoose.connect(process.env.MONGO_URI as string);
+  // Limpar usuários existentes para garantir que o teste registre um novo usuário
+  await User.deleteMany({});
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
+});
 
 describe('Auth Endpoints', () => {
   it('should register a user', async () => {
